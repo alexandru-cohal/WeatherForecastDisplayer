@@ -4,6 +4,7 @@
 #include "arduino_secrets.h"
 
 MKRIoTCarrier carrier;
+WiFiClient client;
 
 void setup() 
 {
@@ -29,6 +30,42 @@ void setup()
   CARRIER_CASE = true;
   carrier.begin();
   carrier.display.setRotation(0);
+
+  char serverAddress[] = "www.7timer.info";
+  
+  Serial.println("\n");
+  Serial.println("Starting connection to server...");
+  
+  if (client.connect(serverAddress, 80))
+  {
+    Serial.println("Connected! \n");
+
+    // Make a HTTP request:  
+    client.println("GET /bin/civillight.php?lon=14.438&lat=50.076&ac=0&unit=metric&output=json&tzshift=0 HTTP/1.1");
+    client.println("Host: www.7timer.info");
+    client.println("Connection: close");
+    client.println();
+  }
+  else
+  {
+    Serial.println("Not connected! \n");
+  } 
+
+  delay(1000);
+
+  String line = "";
+  while (client.connected()) 
+  {
+    line = client.readStringUntil('\n');
+    Serial.println(line);
+    
+    delay(100);
+
+    if (line == "") 
+    {
+      break;
+    }
+  }
 }
 
 void loop() 
