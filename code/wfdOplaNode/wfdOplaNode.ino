@@ -1,10 +1,14 @@
 #include <WiFiNINA.h>
 #include <Arduino_MKRIoTCarrier.h>
+#include <Arduino_JSON.h>
 
 #include "arduino_secrets.h"
 
 MKRIoTCarrier carrier;
 WiFiClient client;
+long date[7];
+String weather[7];
+int tempMax[7], tempMin[7], windSpeed[7];
 
 void setup() 
 {
@@ -31,16 +35,25 @@ void setup()
   carrier.begin();
   carrier.display.setRotation(0);
 
-  char serverAddress[] = "www.7timer.info";
-  
-  Serial.println("\n");
-  Serial.println("Starting connection to server...");
-  
-  if (client.connect(serverAddress, 80))
-  {
-    Serial.println("Connected! \n");
+  String weatherData = getWeatherData();
+  parseWeatherData(weatherData);
+}
 
-    // Make a HTTP request:  
+void loop() 
+{
+}
+
+String getWeatherData()
+{
+  char connectionAddress[] = "www.7timer.info";
+  int connectionPort = 80;
+  int DELAYWAITINGRESPONSE = 1000;
+  int DELAYWAITINGNEWLINE = 100;
+  
+  if (client.connect(connectionAddress, connectionPort))
+  {
+    // Connected
+    // Send a HTTP GET request:  
     client.println("GET /bin/civillight.php?lon=14.438&lat=50.076&ac=0&unit=metric&output=json&tzshift=0 HTTP/1.1");
     client.println("Host: www.7timer.info");
     client.println("Connection: close");
@@ -48,26 +61,51 @@ void setup()
   }
   else
   {
-    Serial.println("Not connected! \n");
+    // Not connected
   } 
 
-  delay(1000);
+  delay(DELAYWAITINGRESPONSE);
 
-  String line = "";
+  // Get the HTTP GET response
+  String currentResponseLine = "";
+  String weatherData = "";
+  bool flagWeatherData = false;
+  
   while (client.connected()) 
   {
-    line = client.readStringUntil('\n');
-    Serial.println(line);
-    
-    delay(100);
+    currentResponseLine = client.readStringUntil('\n');
 
-    if (line == "") 
+    delay(DELAYWAITINGNEWLINE);
+
+    if (currentResponseLine == "{")
+    {
+      flagWeatherData = true;
+    }
+
+    if (flagWeatherData == true)
+    {
+      weatherData = weatherData + currentResponseLine;
+    }
+
+    if (currentResponseLine == "}") 
     {
       break;
     }
   }
+
+  return weatherData;
 }
 
-void loop() 
+void parseWeatherData(String weatherData)
 {
+  JSONVar weatherDataParsed = JSON.parse(weatherData);
+
+  for (int day = 0; day < 7; day++)
+  {
+    date[day] = weatherDataParsed["dataseries"][day]["date"];
+    weather[day] = JSON.stringify(weatherDataParsed["dataseries"][day]["weather"]);
+    tempMax[day] = weatherDataParsed["dataseries"][day]["temp2m"]["max"];
+    tempMin[day] = weatherDataParsed["dataseries"][day]["temp2m"]["min"];
+    windSpeed[day] = weatherDataParsed["dataseries"][day]["wind10m_max"];
+  }
 }
