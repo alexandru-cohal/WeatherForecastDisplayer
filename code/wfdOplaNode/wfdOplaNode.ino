@@ -9,6 +9,7 @@ WiFiClient client;
 long date[7];
 String weather[7];
 int tempMax[7], tempMin[7], windSpeed[7];
+int indexDayToDisplay = 0;
 
 void setup() 
 {
@@ -37,10 +38,38 @@ void setup()
 
   String weatherData = getWeatherData();
   parseWeatherData(weatherData);
+  displayWeatherData(0);
 }
 
 void loop() 
 {
+  carrier.Buttons.update();
+  
+  if (carrier.Button0.onTouchDown()) 
+  {
+    indexDayToDisplay--;
+    if (indexDayToDisplay < 0)
+    {
+      indexDayToDisplay = 0;
+    }
+    else
+    {
+      displayWeatherData(indexDayToDisplay);
+    }
+  }
+
+  if (carrier.Button4.onTouchDown()) 
+  {
+    indexDayToDisplay++;
+    if (indexDayToDisplay > 6)
+    {
+      indexDayToDisplay = 6;
+    }
+    else
+    {
+      displayWeatherData(indexDayToDisplay);
+    }
+  }
 }
 
 String getWeatherData()
@@ -108,4 +137,33 @@ void parseWeatherData(String weatherData)
     tempMin[day] = weatherDataParsed["dataseries"][day]["temp2m"]["min"];
     windSpeed[day] = weatherDataParsed["dataseries"][day]["wind10m_max"];
   }
+}
+
+void displayWeatherData(int dayIndex)
+{
+    carrier.display.fillScreen(ST77XX_BLUE);
+    carrier.display.setTextColor(ST77XX_WHITE);
+    carrier.display.setTextSize(2);
+
+    carrier.display.setCursor(20, 70);
+    carrier.display.print("Date: ");
+    carrier.display.print(date[dayIndex]);
+    
+    carrier.display.setCursor(20, 90);
+    carrier.display.print("Type: ");
+    carrier.display.print(weather[dayIndex]);
+
+    carrier.display.setCursor(20, 110);
+    carrier.display.print("Min temp: ");
+    carrier.display.print(tempMin[dayIndex]);
+
+    carrier.display.setCursor(20, 130);
+    carrier.display.print("Max temp: ");
+    carrier.display.print(tempMax[dayIndex]);
+
+    carrier.display.setCursor(20, 150);
+    carrier.display.print("Wind type: ");
+    carrier.display.print(windSpeed[dayIndex]);
+    
+    delay(500);
 }
