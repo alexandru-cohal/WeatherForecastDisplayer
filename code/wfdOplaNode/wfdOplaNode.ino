@@ -167,3 +167,21 @@ void displayWeatherData(int dayIndex)
     
     delay(500);
 }
+
+int calculateWeekday(int day, int month, int year)
+{
+  // Based on the formula from: https://cs.uwaterloo.ca/~alopez-o/math-faq/node73.html
+  
+  int century = (year % 100) == 0 ? (year / 100) - 1 : year / 100; 
+  year = (month <= 2) ? year % 100 - 1 : year % 100; 
+  month = (month <= 2) ? month - 2 + 12 : month - 2;  
+  
+  int weekday = (day 
+                 + (int)floor(2.6 * month - 0.2)
+                 - 2 * century
+                 + year 
+                 + (int)floor(year / 4.0)
+                 + (int)floor(century / 4.0)) % 7;
+
+  return weekday;
+}
