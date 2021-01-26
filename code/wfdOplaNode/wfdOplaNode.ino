@@ -185,3 +185,10 @@ int calculateWeekday(int day, int month, int year)
 
   return weekday;
 }
+
+void transformDateFromString2Ints(String date, int& day, int& month, int& year)
+{
+  year = date.substring(0, 4).toInt();
+  month = date.substring(4, 6).toInt();
+  day = date.substring(6, 8).toInt();
+}
