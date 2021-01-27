@@ -6,7 +6,7 @@
 
 MKRIoTCarrier carrier;
 WiFiClient client;
-long date[7];
+String date[7];
 String weather[7];
 int tempMax[7], tempMin[7], windSpeed[7];
 int indexDayToDisplay = 0;
@@ -131,7 +131,7 @@ void parseWeatherData(String weatherData)
 
   for (int day = 0; day < 7; day++)
   {
-    date[day] = weatherDataParsed["dataseries"][day]["date"];
+    date[day] = JSON.stringify(weatherDataParsed["dataseries"][day]["date"]);
     weather[day] = JSON.stringify(weatherDataParsed["dataseries"][day]["weather"]);
     tempMax[day] = weatherDataParsed["dataseries"][day]["temp2m"]["max"];
     tempMin[day] = weatherDataParsed["dataseries"][day]["temp2m"]["min"];
@@ -141,29 +141,90 @@ void parseWeatherData(String weatherData)
 
 void displayWeatherData(int dayIndex)
 {
+    // Get the day, month and year as integers
+    int day, month, year;
+    transformDateFromString2Ints(date[dayIndex], day, month, year);
+
+    // Get the weekday as integer and then as string
+    int weekdayInt = calculateWeekday(day, month, year);
+    String weekdayStr;
+    switch (weekdayInt)
+    {
+      case 0: weekdayStr = "Su"; break;
+      case 1: weekdayStr = "Mo"; break;
+      case 2: weekdayStr = "Tu"; break;
+      case 3: weekdayStr = "We"; break;
+      case 4: weekdayStr = "Th"; break;
+      case 5: weekdayStr = "Fr"; break;
+      case 6: weekdayStr = "Sa"; break;
+    }
+  
     carrier.display.fillScreen(ST77XX_BLUE);
     carrier.display.setTextColor(ST77XX_WHITE);
+    
+    carrier.display.setTextSize(3);
+
+    // Display the weekday and the date
+    carrier.display.setCursor(50, 40);
+    carrier.display.print(weekdayStr);
+    carrier.display.print(" ");
+    if (day < 10)
+    {
+      carrier.display.print("0");
+    }
+    carrier.display.print(day);
+    carrier.display.print(".");
+    if (month < 10)
+    {
+      carrier.display.print("0");
+    }
+    carrier.display.print(month);
+
     carrier.display.setTextSize(2);
 
-    carrier.display.setCursor(20, 70);
-    carrier.display.print("Date: ");
-    carrier.display.print(date[dayIndex]);
+    // Display the weather type
+    String weatherType;
+
+    if (weather[dayIndex] == "\"clear\"") weatherType = "Clear";
+    else if (weather[dayIndex] == "\"pcloudy\"") weatherType = "Partly Cloudy";
+    else if (weather[dayIndex] == "\"cloudy\"") weatherType = "Cloudy";
+    else if (weather[dayIndex] == "\"lightrain\"") weatherType = "Light Rain";
+    else if (weather[dayIndex] == "\"rain\"") weatherType = "Rain";
+    else if (weather[dayIndex] == "\"snow\"") weatherType = "Snow";
+    else weatherType = weather[dayIndex];
     
-    carrier.display.setCursor(20, 90);
-    carrier.display.print("Type: ");
-    carrier.display.print(weather[dayIndex]);
+    carrier.display.setCursor(20, 85);
+    carrier.display.print(weatherType);
 
+    // Display the minimum temperature
     carrier.display.setCursor(20, 110);
-    carrier.display.print("Min temp: ");
+    carrier.display.print("Temp Min: ");
     carrier.display.print(tempMin[dayIndex]);
+    carrier.display.print(" \370C");
 
-    carrier.display.setCursor(20, 130);
-    carrier.display.print("Max temp: ");
+    // Display the maximum temperature
+    carrier.display.setCursor(20, 135);
+    carrier.display.print("Temp Max: ");
     carrier.display.print(tempMax[dayIndex]);
+    carrier.display.print(" \370C");
 
-    carrier.display.setCursor(20, 150);
-    carrier.display.print("Wind type: ");
-    carrier.display.print(windSpeed[dayIndex]);
+    // Display the wind type
+    String windType;
+    switch(windSpeed[dayIndex])
+    {
+      case 1: windType = "calm"; break;
+      case 2: windType = "light"; break;
+      case 3: windType = "moderate"; break;
+      case 4: windType = "gresh"; break;
+      case 5: windType = "strong"; break;
+      case 6: windType = "gale"; break;
+      case 7: windType = "storm"; break;
+      case 8: windType = "hurricane"; break;
+    }
+
+    carrier.display.setCursor(20, 160);
+    carrier.display.print("Wind: ");
+    carrier.display.print(windType);
     
     delay(500);
 }
