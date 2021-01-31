@@ -119,6 +119,7 @@ void displayWeatherData(MKRIoTCarrier carrier, weatherData wd, int dayIndex)
     else if (wd.weather[dayIndex] == "\"cloudy\"") weatherType = "Cloudy";
     else if (wd.weather[dayIndex] == "\"lightrain\"") weatherType = "Light Rain";
     else if (wd.weather[dayIndex] == "\"rain\"") weatherType = "Rain";
+    else if (wd.weather[dayIndex] == "\"lightsnow\"") weatherType = "Light Snow";
     else if (wd.weather[dayIndex] == "\"snow\"") weatherType = "Snow";
     else weatherType = wd.weather[dayIndex];
     
