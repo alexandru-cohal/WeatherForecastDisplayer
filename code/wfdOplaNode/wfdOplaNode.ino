@@ -9,6 +9,12 @@
 // 3600000 ms = 60 min
 #define UPDATETIMEINTERVAL 120000 // milliseconds
 
+// The inactivity time interval.
+// If no button is touched for this interval, the weather of the current day will be displayed
+// 5000 ms = 5 s
+// 10000 ms = 10 s
+#define INACTIVITYTIMEINTERVAL 10000 // milliseconds
+
 MKRIoTCarrier carrier;
 
 void setup() 
@@ -58,6 +64,7 @@ void loop()
 
   // Read the buttons' status and display the weather data for the selected day
     static int indexDayToDisplay = 0;
+    static unsigned long lastButtonTouchTime = 0;
     
     carrier.Buttons.update();
   
@@ -73,6 +80,8 @@ void loop()
       {
         displayWeatherData(carrier, weatherDataParsed, indexDayToDisplay);
       }
+
+      lastButtonTouchTime = currentTime;
     }
   
     // Move to the next day
@@ -87,5 +96,14 @@ void loop()
       {
         displayWeatherData(carrier, weatherDataParsed, indexDayToDisplay);
       }
+
+      lastButtonTouchTime = currentTime;
+    }
+
+    // Move to the current day
+    if (abs(currentTime - lastButtonTouchTime) >= INACTIVITYTIMEINTERVAL && indexDayToDisplay != 0)
+    {
+      indexDayToDisplay = 0;
+      displayWeatherData(carrier, weatherDataParsed, indexDayToDisplay);
     }
 }
