@@ -16,6 +16,7 @@ typedef struct weatherData
 String getWeatherDataRaw();
 void parseWeatherDataRaw(String weatherDataRaw, weatherData& wd);
 void displayWeatherData(MKRIoTCarrier carrier, weatherData wd, int dayIndex);
+void displayUpdatingMessage(MKRIoTCarrier carrier);
 int calculateWeekday(int day, int month, int year);
 void transformDateFromString2Ints(String date, int& day, int& month, int& year);
 

@@ -158,6 +158,22 @@ void displayWeatherData(MKRIoTCarrier carrier, weatherData wd, int dayIndex)
     delay(500);
 }
 
+void displayUpdatingMessage(MKRIoTCarrier carrier)
+{
+  carrier.display.fillScreen(ST77XX_RED);
+  carrier.display.setTextColor(ST77XX_WHITE);
+  carrier.display.setTextSize(3);
+  
+  carrier.display.setCursor(50, 60);
+  carrier.display.print("UPDATING");
+  
+  carrier.display.setCursor(20, 110);
+  carrier.display.print("THE WEATHER");
+  
+  carrier.display.setCursor(80, 160);
+  carrier.display.print("DATA");
+}
+
 int calculateWeekday(int day, int month, int year)
 {
   // Based on the formula from: https://cs.uwaterloo.ca/~alopez-o/math-faq/node73.html

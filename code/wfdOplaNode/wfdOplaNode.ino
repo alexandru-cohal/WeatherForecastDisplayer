@@ -4,9 +4,12 @@
 #include "arduino_secrets.h"
 #include "weatherData.h"
 
+// The weather data updating interval
+// 120000 ms = 2 min
+// 3600000 ms = 60 min
+#define UPDATETIMEINTERVAL 120000 // milliseconds
+
 MKRIoTCarrier carrier;
-weatherData wd;
-int indexDayToDisplay = 0;
 
 void setup() 
 {
@@ -32,39 +35,57 @@ void setup()
   CARRIER_CASE = true;
   carrier.begin();
   carrier.display.setRotation(0);
-
-  String weatherDataRaw = getWeatherDataRaw();
-  parseWeatherDataRaw(weatherDataRaw, wd);
-  displayWeatherData(carrier, wd, 0);
 }
 
 void loop() 
 { 
-  carrier.Buttons.update();
+  // Get the weather data periodically
+    static weatherData weatherDataParsed;
+    static unsigned long lastGetCallTime = -UPDATETIMEINTERVAL;
+    unsigned long currentTime = millis();
   
-  if (carrier.Button0.onTouchDown()) 
-  {
-    indexDayToDisplay--;
-    if (indexDayToDisplay < 0)
+    if (abs(currentTime - lastGetCallTime) >= UPDATETIMEINTERVAL)
     {
-      indexDayToDisplay = 0;
+      lastGetCallTime = currentTime;
+  
+      displayUpdatingMessage(carrier);
+      
+      String weatherDataRaw = getWeatherDataRaw();
+      parseWeatherDataRaw(weatherDataRaw, weatherDataParsed);
+      
+      displayWeatherData(carrier, weatherDataParsed, 0);
     }
-    else
-    {
-      displayWeatherData(carrier, wd, indexDayToDisplay);
-    }
-  }
 
-  if (carrier.Button4.onTouchDown()) 
-  {
-    indexDayToDisplay++;
-    if (indexDayToDisplay > 6)
+  // Read the buttons' status and display the weather data for the selected day
+    static int indexDayToDisplay = 0;
+    
+    carrier.Buttons.update();
+  
+    // Move to the previous day
+    if (carrier.Button0.onTouchDown()) 
     {
-      indexDayToDisplay = 6;
+      indexDayToDisplay--;
+      if (indexDayToDisplay < 0)
+      {
+        indexDayToDisplay = 0;
+      }
+      else
+      {
+        displayWeatherData(carrier, weatherDataParsed, indexDayToDisplay);
+      }
     }
-    else
+  
+    // Move to the next day
+    if (carrier.Button4.onTouchDown()) 
     {
-      displayWeatherData(carrier, wd, indexDayToDisplay);
+      indexDayToDisplay++;
+      if (indexDayToDisplay > 6)
+      {
+        indexDayToDisplay = 6;
+      }
+      else
+      {
+        displayWeatherData(carrier, weatherDataParsed, indexDayToDisplay);
+      }
     }
-  }
 }
