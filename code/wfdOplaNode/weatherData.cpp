@@ -121,6 +121,7 @@ void displayWeatherData(MKRIoTCarrier carrier, weatherData wd, int dayIndex)
     else if (wd.weather[dayIndex] == "\"rain\"") weatherType = "Rain";
     else if (wd.weather[dayIndex] == "\"lightsnow\"") weatherType = "Light Snow";
     else if (wd.weather[dayIndex] == "\"snow\"") weatherType = "Snow";
+    else if (wd.weather[dayIndex] == "\"humid\"") weatherType = "Humid";
     else weatherType = wd.weather[dayIndex];
     
     carrier.display.setCursor(20, 85);
@@ -183,12 +184,19 @@ int calculateWeekday(int day, int month, int year)
   year = (month <= 2) ? year % 100 - 1 : year % 100; 
   month = (month <= 2) ? month - 2 + 12 : month - 2;  
   
-  int weekday = (day 
+  int weekday =  day 
                  + (int)floor(2.6 * month - 0.2)
                  - 2 * century
                  + year 
                  + (int)floor(year / 4.0)
-                 + (int)floor(century / 4.0)) % 7;
+                 + (int)floor(century / 4.0);
+
+  while (weekday < 0)
+  {
+    weekday += 7;
+  }
+
+  weekday %= 7;
 
   return weekday;
 }
