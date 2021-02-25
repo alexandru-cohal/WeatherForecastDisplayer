@@ -13,11 +13,21 @@ typedef struct weatherData
   int tempMax[7], tempMin[7], windSpeed[7];
 } weatherData;
 
+typedef struct localWeatherData
+{
+  float temperature;
+  float pressure;
+  float humidity;
+} localWeatherData;
+
 String getWeatherDataRaw();
 void parseWeatherDataRaw(String weatherDataRaw, weatherData& wd);
 void displayWeatherData(MKRIoTCarrier carrier, weatherData wd, int dayIndex);
 void displayUpdatingMessage(MKRIoTCarrier carrier);
 int calculateWeekday(int day, int month, int year);
 void transformDateFromString2Ints(String date, int& day, int& month, int& year);
+
+localWeatherData getLocalWeatherData(MKRIoTCarrier carrier);
+void displayLocalWeatherData(MKRIoTCarrier carrier, localWeatherData lwd);
 
 #endif

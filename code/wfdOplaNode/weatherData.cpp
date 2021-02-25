@@ -211,3 +211,46 @@ void transformDateFromString2Ints(String date, int& day, int& month, int& year)
   month = date.substring(4, 6).toInt();
   day = date.substring(6, 8).toInt();
 }
+
+localWeatherData getLocalWeatherData(MKRIoTCarrier carrier)
+{
+  localWeatherData lwd;
+
+  lwd.temperature = carrier.Env.readTemperature();
+  lwd.pressure = carrier.Pressure.readPressure();
+  lwd.humidity = carrier.Env.readHumidity();
+
+  return lwd;
+}
+
+void displayLocalWeatherData(MKRIoTCarrier carrier, localWeatherData lwd)
+{
+  carrier.display.fillScreen(ST77XX_GREEN);
+  carrier.display.setTextColor(ST77XX_BLACK);
+
+  carrier.display.setTextSize(3);
+
+  // Display the weekday and the date
+  carrier.display.setCursor(90, 40);
+  carrier.display.print("Now");
+    
+  carrier.display.setTextSize(2);
+
+  // Display the temperature
+  carrier.display.setCursor(20, 85);
+  carrier.display.print("Temp: ");
+  carrier.display.print(lwd.temperature);
+  carrier.display.print(" \370C");
+
+  // Display the pressure
+  carrier.display.setCursor(20, 110);
+  carrier.display.print("Pres: ");
+  carrier.display.print(lwd.pressure);
+  carrier.display.print(" kPa");
+
+  // Display the humidity
+  carrier.display.setCursor(20, 135);
+  carrier.display.print("Humid: ");
+  carrier.display.print(lwd.humidity);
+  carrier.display.print(" %");
+}
