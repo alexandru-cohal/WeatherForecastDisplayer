@@ -46,8 +46,8 @@ void setup()
 void loop() 
 { 
   // Get the weather data periodically
-    static weatherData weatherDataParsed;
-    static localWeatherData localWeatherDataRaw;
+    static weatherDataForecast weatherDataForecastParsed;
+    static weatherDataCurrent weatherDataCurrentRaw;
     static unsigned long lastGetCallTime = -UPDATETIMEINTERVAL;
     unsigned long currentTime = millis();
   
@@ -57,12 +57,12 @@ void loop()
   
       displayUpdatingMessage(carrier);
       
-      String weatherDataRaw = getWeatherDataRaw();
-      parseWeatherDataRaw(weatherDataRaw, weatherDataParsed);
+      String weatherDataForecastRaw = getWeatherDataForecastRaw();
+      parseWeatherDataForecastRaw(weatherDataForecastRaw, weatherDataForecastParsed);
       
-      displayWeatherData(carrier, weatherDataParsed, 0);
+      displayWeatherDataForecast(carrier, weatherDataForecastParsed, 0);
 
-      localWeatherDataRaw = getLocalWeatherData(carrier);
+      weatherDataCurrentRaw = getWeatherDataCurrent(carrier);
     }
 
   // Read the buttons' status and display the weather data for the selected day
@@ -81,7 +81,7 @@ void loop()
       }
       else
       {
-        displayWeatherData(carrier, weatherDataParsed, indexDayToDisplay);
+        displayWeatherDataForecast(carrier, weatherDataForecastParsed, indexDayToDisplay);
       }
 
       lastButtonTouchTime = currentTime;
@@ -97,15 +97,16 @@ void loop()
       }
       else
       {
-        displayWeatherData(carrier, weatherDataParsed, indexDayToDisplay);
+        displayWeatherDataForecast(carrier, weatherDataForecastParsed, indexDayToDisplay);
       }
 
       lastButtonTouchTime = currentTime;
     }
 
+    // Switch to the current weather data
     if (carrier.Button2.onTouchDown())
     {
-      displayLocalWeatherData(carrier, localWeatherDataRaw);
+      displayWeatherDataCurrent(carrier, weatherDataCurrentRaw);
       
       lastButtonTouchTime = currentTime;
     }
@@ -114,6 +115,6 @@ void loop()
     if (abs(currentTime - lastButtonTouchTime) >= INACTIVITYTIMEINTERVAL && indexDayToDisplay != 0)
     {
       indexDayToDisplay = 0;
-      displayWeatherData(carrier, weatherDataParsed, indexDayToDisplay);
+      displayWeatherDataForecast(carrier, weatherDataForecastParsed, indexDayToDisplay);
     }
 }

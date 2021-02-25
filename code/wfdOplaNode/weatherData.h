@@ -6,28 +6,29 @@
 #include <Arduino_MKRIoTCarrier.h>
 #include <Arduino_JSON.h>
 
-typedef struct weatherData
+typedef struct weatherDataForecast
 {
   String date[7];
   String weather[7];
   int tempMax[7], tempMin[7], windSpeed[7];
 } weatherData;
 
-typedef struct localWeatherData
+typedef struct weatherDataCurrent
 {
   float temperature;
   float pressure;
   float humidity;
 } localWeatherData;
 
-String getWeatherDataRaw();
-void parseWeatherDataRaw(String weatherDataRaw, weatherData& wd);
-void displayWeatherData(MKRIoTCarrier carrier, weatherData wd, int dayIndex);
+String getWeatherDataForecastRaw();
+void parseWeatherDataForecastRaw(String weatherDataRaw, weatherDataForecast& wdf);
+void displayWeatherDataForecast(MKRIoTCarrier carrier, weatherDataForecast wdf, int dayIndex);
+
+weatherDataCurrent getWeatherDataCurrent(MKRIoTCarrier carrier);
+void displayWeatherDataCurrent(MKRIoTCarrier carrier, weatherDataCurrent wdc);
+
 void displayUpdatingMessage(MKRIoTCarrier carrier);
 int calculateWeekday(int day, int month, int year);
 void transformDateFromString2Ints(String date, int& day, int& month, int& year);
-
-localWeatherData getLocalWeatherData(MKRIoTCarrier carrier);
-void displayLocalWeatherData(MKRIoTCarrier carrier, localWeatherData lwd);
 
 #endif

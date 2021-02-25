@@ -1,6 +1,6 @@
 #include "weatherData.h"
 
-String getWeatherDataRaw()
+String getWeatherDataForecastRaw()
 {
   WiFiClient client;
   char connectionAddress[] = "www.7timer.info";
@@ -26,8 +26,8 @@ String getWeatherDataRaw()
 
   // Get the HTTP GET response
   String currentResponseLine = "";
-  String weatherDataRaw = "";
-  bool flagWeatherDataRaw = false;
+  String weatherDataForecastRaw = "";
+  bool flagWeatherDataForecastRaw = false;
   
   while (client.connected()) 
   {
@@ -37,12 +37,12 @@ String getWeatherDataRaw()
 
     if (currentResponseLine == "{")
     {
-      flagWeatherDataRaw = true;
+      flagWeatherDataForecastRaw = true;
     }
 
-    if (flagWeatherDataRaw == true)
+    if (flagWeatherDataForecastRaw == true)
     {
-      weatherDataRaw = weatherDataRaw + currentResponseLine;
+      weatherDataForecastRaw = weatherDataForecastRaw + currentResponseLine;
     }
 
     if (currentResponseLine == "}") 
@@ -51,28 +51,28 @@ String getWeatherDataRaw()
     }
   }
 
-  return weatherDataRaw;
+  return weatherDataForecastRaw;
 }
 
-void parseWeatherDataRaw(String weatherDataRaw, weatherData& wd)
+void parseWeatherDataForecastRaw(String weatherDataForecastRaw, weatherDataForecast& wdf)
 {
-  JSONVar weatherDataParsed = JSON.parse(weatherDataRaw);
+  JSONVar weatherDataForecastParsed = JSON.parse(weatherDataForecastRaw);
 
   for (int day = 0; day < 7; day++)
   {
-    wd.date[day] = JSON.stringify(weatherDataParsed["dataseries"][day]["date"]);
-    wd.weather[day] = JSON.stringify(weatherDataParsed["dataseries"][day]["weather"]);
-    wd.tempMax[day] = weatherDataParsed["dataseries"][day]["temp2m"]["max"];
-    wd.tempMin[day] = weatherDataParsed["dataseries"][day]["temp2m"]["min"];
-    wd.windSpeed[day] = weatherDataParsed["dataseries"][day]["wind10m_max"];
+    wdf.date[day] = JSON.stringify(weatherDataForecastParsed["dataseries"][day]["date"]);
+    wdf.weather[day] = JSON.stringify(weatherDataForecastParsed["dataseries"][day]["weather"]);
+    wdf.tempMax[day] = weatherDataForecastParsed["dataseries"][day]["temp2m"]["max"];
+    wdf.tempMin[day] = weatherDataForecastParsed["dataseries"][day]["temp2m"]["min"];
+    wdf.windSpeed[day] = weatherDataForecastParsed["dataseries"][day]["wind10m_max"];
   }
 }
 
-void displayWeatherData(MKRIoTCarrier carrier, weatherData wd, int dayIndex)
+void displayWeatherDataForecast(MKRIoTCarrier carrier, weatherDataForecast wdf, int dayIndex)
 {
     // Get the day, month and year as integers
     int day, month, year;
-    transformDateFromString2Ints(wd.date[dayIndex], day, month, year);
+    transformDateFromString2Ints(wdf.date[dayIndex], day, month, year);
 
     // Get the weekday as integer and then as string
     int weekdayInt = calculateWeekday(day, month, year);
@@ -114,19 +114,19 @@ void displayWeatherData(MKRIoTCarrier carrier, weatherData wd, int dayIndex)
     // Display the weather type
     String weatherType;
 
-    if (wd.weather[dayIndex] == "\"clear\"") weatherType = "Clear";
-    else if (wd.weather[dayIndex] == "\"pcloudy\"") weatherType = "Partly Cloudy";
-    else if (wd.weather[dayIndex] == "\"mcloudy\"") weatherType = "Mostly Cloudy";
-    else if (wd.weather[dayIndex] == "\"cloudy\"") weatherType = "Cloudy";
-    else if (wd.weather[dayIndex] == "\"humid\"") weatherType = "Humid";
-    else if (wd.weather[dayIndex] == "\"lightrain\"") weatherType = "Light Rain";
-    else if (wd.weather[dayIndex] == "\"oshower\"") weatherType = "Occasional showers";
-    else if (wd.weather[dayIndex] == "\"ishower\"") weatherType = "Isolated showers";
-    else if (wd.weather[dayIndex] == "\"rain\"") weatherType = "Rain";
-    else if (wd.weather[dayIndex] == "\"lightsnow\"") weatherType = "Light Snow";
-    else if (wd.weather[dayIndex] == "\"snow\"") weatherType = "Snow";
-    else if (wd.weather[dayIndex] == "\"rainsnow\"") weatherType = "Freezing Rain";
-    else weatherType = wd.weather[dayIndex];
+    if (wdf.weather[dayIndex] == "\"clear\"") weatherType = "Clear";
+    else if (wdf.weather[dayIndex] == "\"pcloudy\"") weatherType = "Partly Cloudy";
+    else if (wdf.weather[dayIndex] == "\"mcloudy\"") weatherType = "Mostly Cloudy";
+    else if (wdf.weather[dayIndex] == "\"cloudy\"") weatherType = "Cloudy";
+    else if (wdf.weather[dayIndex] == "\"humid\"") weatherType = "Humid";
+    else if (wdf.weather[dayIndex] == "\"lightrain\"") weatherType = "Light Rain";
+    else if (wdf.weather[dayIndex] == "\"oshower\"") weatherType = "Occasional showers";
+    else if (wdf.weather[dayIndex] == "\"ishower\"") weatherType = "Isolated showers";
+    else if (wdf.weather[dayIndex] == "\"rain\"") weatherType = "Rain";
+    else if (wdf.weather[dayIndex] == "\"lightsnow\"") weatherType = "Light Snow";
+    else if (wdf.weather[dayIndex] == "\"snow\"") weatherType = "Snow";
+    else if (wdf.weather[dayIndex] == "\"rainsnow\"") weatherType = "Freezing Rain";
+    else weatherType = wdf.weather[dayIndex];
     
     carrier.display.setCursor(20, 85);
     carrier.display.print(weatherType);
@@ -134,18 +134,18 @@ void displayWeatherData(MKRIoTCarrier carrier, weatherData wd, int dayIndex)
     // Display the minimum temperature
     carrier.display.setCursor(20, 110);
     carrier.display.print("Temp Min: ");
-    carrier.display.print(wd.tempMin[dayIndex]);
+    carrier.display.print(wdf.tempMin[dayIndex]);
     carrier.display.print(" \370C");
 
     // Display the maximum temperature
     carrier.display.setCursor(20, 135);
     carrier.display.print("Temp Max: ");
-    carrier.display.print(wd.tempMax[dayIndex]);
+    carrier.display.print(wdf.tempMax[dayIndex]);
     carrier.display.print(" \370C");
 
     // Display the wind type
     String windType;
-    switch(wd.windSpeed[dayIndex])
+    switch(wdf.windSpeed[dayIndex])
     {
       case 1: windType = "calm"; break;
       case 2: windType = "light"; break;
@@ -162,6 +162,49 @@ void displayWeatherData(MKRIoTCarrier carrier, weatherData wd, int dayIndex)
     carrier.display.print(windType);
     
     delay(500);
+}
+
+weatherDataCurrent getWeatherDataCurrent(MKRIoTCarrier carrier)
+{
+  weatherDataCurrent wdc;
+
+  wdc.temperature = carrier.Env.readTemperature();
+  wdc.pressure = carrier.Pressure.readPressure();
+  wdc.humidity = carrier.Env.readHumidity();
+
+  return wdc;
+}
+
+void displayWeatherDataCurrent(MKRIoTCarrier carrier, weatherDataCurrent wdc)
+{
+  carrier.display.fillScreen(ST77XX_GREEN);
+  carrier.display.setTextColor(ST77XX_BLACK);
+
+  carrier.display.setTextSize(3);
+
+  // Display the weekday and the date
+  carrier.display.setCursor(90, 40);
+  carrier.display.print("Now");
+    
+  carrier.display.setTextSize(2);
+
+  // Display the temperature
+  carrier.display.setCursor(20, 85);
+  carrier.display.print("Temp: ");
+  carrier.display.print(wdc.temperature);
+  carrier.display.print(" \370C");
+
+  // Display the pressure
+  carrier.display.setCursor(20, 110);
+  carrier.display.print("Pres: ");
+  carrier.display.print(wdc.pressure);
+  carrier.display.print(" kPa");
+
+  // Display the humidity
+  carrier.display.setCursor(20, 135);
+  carrier.display.print("Humid: ");
+  carrier.display.print(wdc.humidity);
+  carrier.display.print(" %");
 }
 
 void displayUpdatingMessage(MKRIoTCarrier carrier)
@@ -210,47 +253,4 @@ void transformDateFromString2Ints(String date, int& day, int& month, int& year)
   year = date.substring(0, 4).toInt();
   month = date.substring(4, 6).toInt();
   day = date.substring(6, 8).toInt();
-}
-
-localWeatherData getLocalWeatherData(MKRIoTCarrier carrier)
-{
-  localWeatherData lwd;
-
-  lwd.temperature = carrier.Env.readTemperature();
-  lwd.pressure = carrier.Pressure.readPressure();
-  lwd.humidity = carrier.Env.readHumidity();
-
-  return lwd;
-}
-
-void displayLocalWeatherData(MKRIoTCarrier carrier, localWeatherData lwd)
-{
-  carrier.display.fillScreen(ST77XX_GREEN);
-  carrier.display.setTextColor(ST77XX_BLACK);
-
-  carrier.display.setTextSize(3);
-
-  // Display the weekday and the date
-  carrier.display.setCursor(90, 40);
-  carrier.display.print("Now");
-    
-  carrier.display.setTextSize(2);
-
-  // Display the temperature
-  carrier.display.setCursor(20, 85);
-  carrier.display.print("Temp: ");
-  carrier.display.print(lwd.temperature);
-  carrier.display.print(" \370C");
-
-  // Display the pressure
-  carrier.display.setCursor(20, 110);
-  carrier.display.print("Pres: ");
-  carrier.display.print(lwd.pressure);
-  carrier.display.print(" kPa");
-
-  // Display the humidity
-  carrier.display.setCursor(20, 135);
-  carrier.display.print("Humid: ");
-  carrier.display.print(lwd.humidity);
-  carrier.display.print(" %");
 }
