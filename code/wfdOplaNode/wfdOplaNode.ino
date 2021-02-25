@@ -47,6 +47,7 @@ void loop()
 { 
   // Get the weather data periodically
     static weatherData weatherDataParsed;
+    static localWeatherData localWeatherDataRaw;
     static unsigned long lastGetCallTime = -UPDATETIMEINTERVAL;
     unsigned long currentTime = millis();
   
@@ -60,6 +61,8 @@ void loop()
       parseWeatherDataRaw(weatherDataRaw, weatherDataParsed);
       
       displayWeatherData(carrier, weatherDataParsed, 0);
+
+      localWeatherDataRaw = getLocalWeatherData(carrier);
     }
 
   // Read the buttons' status and display the weather data for the selected day
@@ -97,6 +100,13 @@ void loop()
         displayWeatherData(carrier, weatherDataParsed, indexDayToDisplay);
       }
 
+      lastButtonTouchTime = currentTime;
+    }
+
+    if (carrier.Button2.onTouchDown())
+    {
+      displayLocalWeatherData(carrier, localWeatherDataRaw);
+      
       lastButtonTouchTime = currentTime;
     }
 
