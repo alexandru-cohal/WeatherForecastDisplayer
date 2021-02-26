@@ -37,6 +37,9 @@ void setup()
   }
   Serial.println("Connected to wifi");
 
+  // Enable the low power mode of the WiFi module
+  WiFi.lowPowerMode();
+
   //Initialize the MKR IoT Carrier and output any errors in the serial monitor
   CARRIER_CASE = true;
   carrier.begin();
