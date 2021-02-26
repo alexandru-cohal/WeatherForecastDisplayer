@@ -50,16 +50,19 @@ void loop()
     static weatherDataCurrent weatherDataCurrentRaw;
     static unsigned long lastGetCallTime = -UPDATETIMEINTERVAL;
     unsigned long currentTime = millis();
+    static bool flagWeatherDataForecastDisplayed = false;
   
     if (abs(currentTime - lastGetCallTime) >= UPDATETIMEINTERVAL)
     {
       lastGetCallTime = currentTime;
-  
+
+      flagWeatherDataForecastDisplayed = false;
       displayUpdatingMessage(carrier);
       
       String weatherDataForecastRaw = getWeatherDataForecastRaw();
       parseWeatherDataForecastRaw(weatherDataForecastRaw, weatherDataForecastParsed);
-      
+
+      flagWeatherDataForecastDisplayed = true;
       displayWeatherDataForecast(carrier, weatherDataForecastParsed, 0);
 
       weatherDataCurrentRaw = getWeatherDataCurrent(carrier);
@@ -74,13 +77,15 @@ void loop()
     // Move to the previous day
     if (carrier.Button0.onTouchDown()) 
     {
-      indexDayToDisplay--;
-      if (indexDayToDisplay < 0)
+      if (flagWeatherDataForecastDisplayed == false)
       {
-        indexDayToDisplay = 0;
+        flagWeatherDataForecastDisplayed = true;
+        displayWeatherDataForecast(carrier, weatherDataForecastParsed, indexDayToDisplay); 
       }
-      else
+      else if (indexDayToDisplay > 0)
       {
+        indexDayToDisplay--;
+        flagWeatherDataForecastDisplayed = true;
         displayWeatherDataForecast(carrier, weatherDataForecastParsed, indexDayToDisplay);
       }
 
@@ -90,13 +95,15 @@ void loop()
     // Move to the next day
     if (carrier.Button4.onTouchDown()) 
     {
-      indexDayToDisplay++;
-      if (indexDayToDisplay > 6)
+      if (flagWeatherDataForecastDisplayed == false)
       {
-        indexDayToDisplay = 6;
+        flagWeatherDataForecastDisplayed = true;
+        displayWeatherDataForecast(carrier, weatherDataForecastParsed, indexDayToDisplay); 
       }
-      else
+      else if (indexDayToDisplay < 6)
       {
+        indexDayToDisplay++;
+        flagWeatherDataForecastDisplayed = true;
         displayWeatherDataForecast(carrier, weatherDataForecastParsed, indexDayToDisplay);
       }
 
@@ -106,15 +113,17 @@ void loop()
     // Switch to the current weather data
     if (carrier.Button2.onTouchDown())
     {
+      flagWeatherDataForecastDisplayed = false;
       displayWeatherDataCurrent(carrier, weatherDataCurrentRaw);
       
       lastButtonTouchTime = currentTime;
     }
 
     // Move to the current day
-    if (abs(currentTime - lastButtonTouchTime) >= INACTIVITYTIMEINTERVAL && indexDayToDisplay != 0)
+    if (abs(currentTime - lastButtonTouchTime) >= INACTIVITYTIMEINTERVAL && (indexDayToDisplay != 0 || flagWeatherDataForecastDisplayed == false))
     {
       indexDayToDisplay = 0;
+      flagWeatherDataForecastDisplayed = true;
       displayWeatherDataForecast(carrier, weatherDataForecastParsed, indexDayToDisplay);
     }
 }
