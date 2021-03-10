@@ -21,7 +21,6 @@ void setup()
 {
   // Initialize the Serial data transmission
   Serial.begin(9600);
-  while (!Serial);
 
   // Connect to the WiFi network
   int status = WL_IDLE_STATUS;

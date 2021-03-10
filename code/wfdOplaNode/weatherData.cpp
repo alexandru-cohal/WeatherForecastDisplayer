@@ -7,6 +7,8 @@ String getWeatherDataForecastRaw()
   int connectionPort = 80;
   int DELAYWAITINGRESPONSE = 1000;
   int DELAYWAITINGNEWLINE = 100;
+
+  Serial.print("Getting the weather data forecast... ");
   
   if (client.connect(connectionAddress, connectionPort))
   {
@@ -50,6 +52,8 @@ String getWeatherDataForecastRaw()
       break;
     }
   }
+
+  Serial.println("Done");
 
   return weatherDataForecastRaw;
 }
