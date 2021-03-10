@@ -1,3 +1,8 @@
+/*
+ * weatherData.cpp: File which contains the definitioons of the functions used for 
+ * getting, processing and displaying the weather data forecast and the current weather data
+ */
+
 #include "weatherData.h"
 
 String getWeatherDataForecastRaw()

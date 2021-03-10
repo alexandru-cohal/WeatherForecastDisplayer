@@ -1,3 +1,8 @@
+/*
+ * weatherData.h: File which contains the declarations of the functions used for 
+ * getting, processing and displaying the weather data forecast and the current weather data
+ */
+
 #ifndef WEATHERDATA_H
 #define WEATHERDATA_H
 

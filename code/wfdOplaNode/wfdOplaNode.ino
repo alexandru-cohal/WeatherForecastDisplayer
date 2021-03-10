@@ -1,3 +1,22 @@
+/*
+ * wfdOplaNode.ino: The main source code file of the WeatherDataDisplayer project. 
+ * 
+ * Weather forecast data for 7 days (minimum and maximum temperature, weather type and wind type) and 
+ * current (local) weather data (temperature, pressure and humidity) are obtained from internet and 
+ * from the embedded sensors and displayed on the screen.
+ * By default, the forecast for the current day is displayed on the screen. The touch buttons are used 
+ * to change the data displayed:
+ *  - Button 0: shows the forecast for the previous day (if available)
+ *  - Button 4: shows the forecast for the next day (if available)
+ *  - Button 2: shows the current (local) weather data
+ * 
+ * This file contains the setup function (which initializes the Serial port, the WiFi module and the MKRIoTCarrier) 
+ * and the loop functions (in which the periodic update of the weather data is triggered and the 
+ * status of the buttons is read and some actions are triggered accordingly)
+ * 
+ * IMPORTANT: The WiFi credentials have to be set in the arduino_secrets.h file!
+ */
+
 #include <WiFiNINA.h>
 #include <Arduino_MKRIoTCarrier.h>
 
