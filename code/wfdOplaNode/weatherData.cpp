@@ -1,5 +1,5 @@
 /*
- * weatherData.cpp: File which contains the definitioons of the functions used for 
+ * weatherData.cpp: File which contains the definitions of the functions used for 
  * getting, processing and displaying the weather data forecast and the current weather data
  */
 
