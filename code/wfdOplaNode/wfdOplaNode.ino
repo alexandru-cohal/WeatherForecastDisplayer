@@ -26,7 +26,7 @@
 // The weather data updating interval
 // 120000 ms = 2 min
 // 3600000 ms = 60 min
-#define UPDATETIMEINTERVAL 120000 // milliseconds
+#define UPDATETIMEINTERVAL 3600000 // milliseconds
 
 // The inactivity time interval.
 // If no button is touched for this interval, the weather of the current day will be displayed
