@@ -159,7 +159,7 @@ void displayWeatherDataForecast(MKRIoTCarrier carrier, weatherDataForecast wdf, 
       case 1: windType = "calm"; break;
       case 2: windType = "light"; break;
       case 3: windType = "moderate"; break;
-      case 4: windType = "gresh"; break;
+      case 4: windType = "fresh"; break;
       case 5: windType = "strong"; break;
       case 6: windType = "gale"; break;
       case 7: windType = "storm"; break;
